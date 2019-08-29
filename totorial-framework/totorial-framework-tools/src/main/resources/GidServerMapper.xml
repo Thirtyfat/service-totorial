@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mglj.totorial.framework.gid.dao.api.GidServerDao">
+
+	<resultMap id="GidServerResultMap" type="com.mglj.totorial.framework.gid.domain.GidServer">
+        <result property="id" column="id"/>
+        <result property="ip" column="ip"/>
+        <result property="sequence" column="sequence"/>
+	</resultMap>
+	
+	<sql id="columns">
+		id,ip,sequence
+	</sql>
+
+	<insert id="save" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO gid_server (
+        	id ,
+        	ip ,
+        	sequence 
+        ) VALUES (
+        	#{id} ,
+        	#{ip} ,
+        	#{sequence} 
+        )
+	</insert>
+    
+	<update id="update" >
+        UPDATE gid_server SET
+	        ip = #{ip} ,
+	        sequence = #{sequence} 
+        WHERE 
+	        id = #{id} 
+	</update>
+
+    <delete id="delete">
+        DELETE FROM gid_server WHERE
+        id = #{id} 
+    </delete>
+    
+    <select id="findOne" resultMap="GidServerResultMap">
+		SELECT <include refid="columns" />
+		    FROM gid_server 
+	        WHERE 
+		        id = #{id} 
+	</select>
+	
+	 <select id="findOneByIp" resultMap="GidServerResultMap">
+		SELECT <include refid="columns" />
+		    FROM gid_server 
+	        WHERE 
+		        ip = #{ip} 
+		        LIMIT 1
+	</select>
+	
+	<select id="existsBy" resultType="boolean">
+		SELECT count(id)
+		    FROM gid_server 
+		    WHERE 
+        		(ip = #{0} or sequence = #{1})
+        		<if test="param3 != null">
+					AND id != #{2}
+				</if>
+	</select>
+	
+	<select id="findAll" resultMap="GidServerResultMap">
+		SELECT <include refid="columns" />
+		FROM gid_server
+		ORDER BY ip
+    </select>
+
+	<insert id="saveAll">
+		INSERT INTO gid_server(
+		id ,
+		ip ,
+		sequence
+		)
+		VALUES
+		<foreach collection="collection" item="item" open="(" close=")" separator="),(">
+			#{item.id},
+			#{item.ip},
+			#{item.sequence}
+		</foreach>
+	</insert>
+
+	<update id="updateEmpty">
+		UPDATE gid_server SET
+			ip = #{param2}
+		WHERE
+			sequence = #{param1}
+			AND (ip is NULL OR ip = '')
+	</update>
+
+	<select id="getSequenceByIp" resultType="int">
+		SELECT
+			sequence
+		FROM gid_server
+		WHERE
+			ip = #{param1}
+		LIMIT 1
+	</select>
+
+	<select id="listEmpty" resultMap="GidServerResultMap">
+		SELECT
+			id,
+			ip,
+			sequence
+		FROM gid_server
+		WHERE
+			(ip is NULL OR ip = '')
+		ORDER BY sequence
+		LIMIT #{param1}
+	</select>
+	
+</mapper>
+
