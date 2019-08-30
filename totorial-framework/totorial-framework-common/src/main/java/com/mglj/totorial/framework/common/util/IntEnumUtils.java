@@ -1,6 +1,7 @@
 package com.mglj.totorial.framework.common.util;
 
-import com.yhdx.baseframework.common.lang.CodeEnum;
+
+import com.mglj.totorial.framework.common.lang.CodeEnum;
 
 import java.util.Objects;
 

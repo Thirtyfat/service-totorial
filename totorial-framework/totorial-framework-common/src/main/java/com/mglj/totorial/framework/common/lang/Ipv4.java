@@ -1,6 +1,7 @@
 package com.mglj.totorial.framework.common.lang;
 
-import com.yhdx.baseframework.common.util.RegexUtils;
+
+import com.mglj.totorial.framework.common.util.RegexUtils;
 
 /**
  * Ipv4地址，用整形存储表示

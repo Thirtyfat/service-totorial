@@ -1,7 +1,8 @@
 package com.mglj.totorial.framework.common.util;
 
-import com.yhdx.baseframework.common.function.ForeachSubListConsumer;
-import com.yhdx.baseframework.common.function.ForeachSubMapConsumer;
+
+import com.mglj.totorial.framework.common.function.ForeachSubListConsumer;
+import com.mglj.totorial.framework.common.function.ForeachSubMapConsumer;
 
 import java.util.*;
 import java.util.function.Function;
