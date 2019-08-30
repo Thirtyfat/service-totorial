@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mglj.shards.service.dao.api.WmsShardDao">
+
+	<resultMap id="WmsShardResultMap" type="com.mglj.shards.service.domain.po.WmsShardPO">
+		<result property="warehouseId" column="warehouse_id"/>
+		<result property="datasourceGroupId" column="datasource_group_id"/>
+	</resultMap>
+
+	<sql id="columns">
+		warehouse_id,datasource_group_id
+	</sql>
+
+	<insert id="saveShard">
+		INSERT INTO wms_shard (
+			warehouse_id ,
+			datasource_group_id
+		) VALUES (
+			#{param1} ,
+			#{param2}
+		)
+	</insert>
+
+	<update id="updateShard">
+		UPDATE wms_shard SET
+			datasource_group_id = #{param2}
+		WHERE
+			warehouse_id = #{param1}
+	</update>
+
+	<delete id="deleteShard">
+		DELETE FROM wms_shard
+		WHERE
+			warehouse_id = #{param1}
+	</delete>
+
+	<select id="getShard" resultType="long">
+    	SELECT
+			datasource_group_id
+	    FROM wms_shard
+	    WHERE
+			warehouse_id = #{param1}
+    </select>
+
+	<sql id="findWhere">
+		<where>
+			<if test="warehouseId !=null">
+				AND warehouse_id = #{warehouseId}
+			</if>
+		</where>
+	</sql>
+
+	<select id="listShard" resultMap="WmsShardResultMap">
+		SELECT
+		<include refid="columns"/>
+		FROM wms_shard
+		INNER JOIN (
+		SELECT warehouse_id
+		FROM wms_shard
+		<include refid="findWhere"/>
+		ORDER BY warehouse_id
+		LIMIT #{offset}, #{rows}
+		) AS t
+		USING ( warehouse_id )
+	</select>
+
+	<select id="countShard" resultType="int">
+		SELECT count(*)
+		FROM wms_shard
+		<include refid="findWhere"/>
+	</select>
+
+	<select id="listAllShard" resultMap="WmsShardResultMap">
+		SELECT <include refid="columns"/>
+		FROM wms_shard
+	</select>
+
+	<select id="listWarehouseId" resultType="long">
+		SELECT
+			warehouse_id
+		FROM wms_shard
+		WHERE
+			datasource_group_id = #{param1}
+	</select>
+
+	<select id="listAllWarehouseId" resultType="long">
+		SELECT
+			warehouse_id
+		FROM wms_shard
+	</select>
+	
+</mapper>
+

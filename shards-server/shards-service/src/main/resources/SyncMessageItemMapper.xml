@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mglj.shards.service.dao.api.SyncMessageItemDao">
+
+	<resultMap id="SyncMessageItemResultMap" type="com.mglj.shards.service.domain.po.SyncMessageItemPO">
+        <result property="syncMessageId" column="sync_message_id"/>
+        <result property="bizId" column="biz_id"/>
+        <result property="bizType" column="biz_type"/>
+        <result property="createTime" column="create_time"/>
+	</resultMap>
+	
+	<sql id="columns">
+		sync_message_id,biz_id,biz_type,create_time
+	</sql>
+	
+	<insert id="saveAllSyncMessageItem">
+        INSERT INTO sync_message_item (
+        	sync_message_id ,
+        	biz_id ,
+			biz_type ,
+        	create_time 
+        ) VALUES 
+		<foreach collection="collection" item="item" open="(" close=")" separator="),(">
+        	#{item.syncMessageId} ,
+        	#{item.bizId} ,
+        	#{item.bizType} ,
+        	#{item.createTime}
+		</foreach>
+	</insert>
+	
+	<select id="listSyncMessageItemByIds" resultMap="SyncMessageItemResultMap">
+    	SELECT <include refid="columns" />
+	    FROM sync_message_item 
+		WHERE 
+			sync_message_id IN
+			<foreach collection="collection" item="item" open="(" close=")" separator=",">#{item}</foreach>
+    </select>
+	
+</mapper>
+

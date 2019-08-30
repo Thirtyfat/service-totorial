@@ -1,0 +1,25 @@
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://admin:123456@localhost:10001/eureka/
+
+spring:
+  datasource:
+    url: jdbc:mysql://172.16.200.42:3306/scm_shards?characterEncoding=utf-8&allowMultiQueries=true&zeroDateTimeBehavior=convertToNull
+    username: dev_w
+    password: devw@234
+  rabbitmq:
+    host: 172.16.200.42
+    port: 5672
+    username: dev_admin
+    password: devadmin_pwd
+    virtual-host: wms_test
+
+ribbon:
+  ReadTimeout: 60000
+  ConnectTimeout: 60000
+
+myconf:
+  gid:
+    timestamp:
+      offset: 0

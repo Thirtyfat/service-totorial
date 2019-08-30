@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mglj.totorial.framework.tool.dao.api.ServerDao">
+
+	<insert id="saveAllServer">
+		INSERT INTO server(
+			`name`,
+			ip,
+			port,
+			sequence
+		)
+		VALUES
+		<foreach collection="collection" item="item" open="(" close=")" separator="),(">
+			#{item.name},
+			#{item.ip},
+			#{item.port},
+			#{item.sequence}
+		</foreach>
+	</insert>
+
+	<update id="updateEmptyServer">
+		UPDATE server SET
+			`name` = #{param2},
+			ip = #{param3},
+			port = #{param4}
+		WHERE
+			sequence = #{param1}
+			AND (ip is NULL OR ip = '')
+			AND port = 0
+	</update>
+
+	<select id="getSequenceByIpAndPort" resultType="int">
+		SELECT
+			sequence
+		FROM server
+	    WHERE
+		    ip = #{param1}
+		 	AND port = #{param2}
+		LIMIT 1
+	</select>
+
+	<select id="listEmptyServer" resultType="com.yhdx.baseframework.tool.coordinate.domain.Server">
+		SELECT
+			id,
+			`name`,
+			ip,
+			port,
+			sequence
+		FROM server
+		WHERE
+			(ip is NULL OR ip = '')
+			AND port = 0
+		ORDER BY sequence
+		LIMIT #{param1}
+	</select>
+	
+</mapper>
+

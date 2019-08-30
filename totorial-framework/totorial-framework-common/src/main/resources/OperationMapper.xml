@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mglj.totorial.framework.tool.dao.api.OperationDao">
+
+	<resultMap id="OperationMap" type="com.mglj.totorial.framework.tool.metadata.domain.Operation">
+		<result property="id" column="id"/>
+		<result property="className" column="class_name"/>
+		<result property="methodName" column="method_name"/>
+		<result property="hashCode" column="hash_code"/>
+		<result property="offset" column="offset"/>
+		<result property="title" column="title"/>
+		<result property="group" column="group"/>
+	</resultMap>
+
+	<sql id="columns">
+		id,
+		class_name,
+		method_name,
+		hash_code,
+		offset,
+		title,
+		`group`
+	</sql>
+
+	<insert id="saveOperation" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO operation (
+			class_name ,
+			method_name ,
+			hash_code ,
+			offset ,
+			title ,
+			`group`
+		) SELECT
+			#{className} ,
+			#{methodName} ,
+			#{hashCode} ,
+			#{offset} ,
+			#{title} ,
+			#{group}
+		FROM dual
+		WHERE NOT EXISTS
+			(
+				SELECT id
+				FROM operation
+				WHERE
+					hash_code = #{hashCode}
+					AND offset = #{offset}
+			)
+	</insert>
+
+	<select id="listOperationByHashCode" resultMap="OperationMap">
+		SELECT <include refid="columns" />
+		FROM operation
+		WHERE
+			hash_code = #{param1}
+	</select>
+
+	<select id="getOperationListByHashCodeAndOffset" resultMap="OperationMap">
+		  SELECT <include refid="columns" />
+		  FROM operation WHERE
+		  <foreach collection="collection" item="item" open="(" close=")" separator="or">
+		  hash_code = #{item.hashCode} and offset = #{item.offset}
+		  </foreach>
+	</select>
+</mapper>
+

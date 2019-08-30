@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mglj.shards.service.dao.api.SyncMessageDao">
+
+	<resultMap id="SyncMessageResultMap" type="com.mglj.shards.service.domain.po.SyncMessagePO">
+        <result property="syncMessageId" column="sync_message_id"/>
+        <result property="action" column="action"/>
+		<result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+	</resultMap>
+	
+	<sql id="columns">
+		sync_message_id,`action`,remark,create_time
+	</sql>
+
+	<insert id="saveSyncMessage" useGeneratedKeys="true" keyProperty="syncMessageId">
+        INSERT INTO sync_message (
+        	sync_message_id ,
+        	`action` ,
+        	remark ,
+        	create_time 
+        ) VALUES (
+        	#{syncMessageId} ,
+        	#{action} ,
+        	#{remark} ,
+        	#{createTime} 
+        )
+	</insert>
+    
+    <select id="getSyncMessage" resultMap="SyncMessageResultMap">
+		SELECT <include refid="columns" />
+		    FROM sync_message 
+	        WHERE 
+		        sync_message_id = #{param1}
+	</select>
+	
+	<sql id="findWhere">
+		<!--<where>-->
+	       <!--<if test="action !=null">-->
+				<!--AND `action` = #{action}-->
+			<!--</if>-->
+	       <!--<if test="createTimeBegin !=null and createTimeBegin != ''">-->
+				<!--AND create_time >= #{createTimeBegin}-->
+		   <!--</if>-->
+		   <!--<if test="createTimeEnd !=null and createTimeEnd != ''">-->
+				<!--AND create_time &lt;= #{createTimeEnd}-->
+		   <!--</if>-->
+		<!--</where>-->
+	</sql>
+	
+	<select id="listSyncMessage" resultMap="SyncMessageResultMap">
+		SELECT <include refid="columns" />
+		FROM sync_message
+		INNER JOIN (
+		SELECT sync_message_id
+		FROM sync_message
+		<include refid="findWhere"/>
+		ORDER BY sync_message_id DESC
+		LIMIT #{offset}, #{rows}
+		) AS t
+		USING ( sync_message_id )
+		ORDER BY sync_message_id DESC
+    </select>
+		
+    <select id="countSyncMessage" resultType="int">
+        SELECT count(*) FROM sync_message 
+		<include refid="findWhere"/>    
+    </select>
+	
+</mapper>
+

@@ -14,7 +14,6 @@
 
     <modules>
         <module>totorial-framework-common</module>
-        <module>totorial-framework-tools</module>
     </modules>
 
 </project>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mglj.shards.service.dao.api.DatasourceDao">
+
+    <resultMap id="DatasourceResultMap" type="com.mglj.shards.service.domain.po.DatasourcePO">
+        <result property="datasourceId" column="datasource_id"/>
+        <result property="type" column="type"/>
+        <result property="name" column="name"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="columns">
+		datasource_id,`type`,`name`,update_time,remark
+	</sql>
+
+    <insert id="saveDatasource">
+        INSERT INTO datasource (
+            datasource_id ,
+        	`type` ,
+        	`name` ,
+        	update_time ,
+        	remark
+        ) VALUES (
+            #{datasourceId} ,
+        	#{type} ,
+        	#{name} ,
+        	#{updateTime} ,
+        	#{remark}
+        )
+	</insert>
+
+    <update id="updateDatasource">
+        UPDATE datasource SET
+	        update_time = #{updateTime} ,
+	        remark = #{remark}
+        WHERE 
+	        datasource_id = #{datasourceId} 
+	</update>
+
+    <delete id="deleteDatasource">
+        DELETE FROM datasource
+        WHERE
+        	datasource_id = #{datasourceId}
+    </delete>
+
+    <select id="isNameExisted" resultType="boolean">
+        SELECT
+            count(*) > 0
+        FROM datasource
+        WHERE
+            `name` = #{param1}
+            <if test="param2 != null">
+                AND datasource_id != #{param2}
+            </if>
+    </select>
+
+    <select id="countDatasourceExist" resultType="int">
+        SELECT
+            count(*)
+        FROM datasource
+        WHERE
+            datasource_id IN
+            <foreach collection="collection" item="item" open="(" close=")" separator=",">#{item}</foreach>
+    </select>
+
+    <select id="getDatasource" resultMap="DatasourceResultMap">
+        SELECT
+        <include refid="columns"/>
+        FROM datasource
+        WHERE
+        datasource_id = #{datasourceId}
+    </select>
+
+    <select id="listDatasourceByIds" resultMap="DatasourceResultMap">
+        SELECT
+        <include refid="columns"/>
+        FROM datasource
+        WHERE
+        datasource_id IN
+        <foreach collection="collection" item="item" open="(" close=")" separator=",">#{item}</foreach>
+    </select>
+
+    <sql id="findWhere">
+        <where>
+            <if test="type !=null">
+                AND `type` = #{type}
+            </if>
+            <if test="name !=null and name != ''">
+                AND `name` LIKE CONCAT('${name}', '%')
+            </if>
+        </where>
+    </sql>
+
+    <select id="listDatasource" resultMap="DatasourceResultMap">
+        SELECT
+        <include refid="columns"/>
+        FROM datasource
+        INNER JOIN (
+        SELECT datasource_id
+        FROM datasource
+        <include refid="findWhere"/>
+        ORDER BY datasource_id
+        LIMIT #{offset}, #{rows}
+        ) AS t
+        USING ( datasource_id )
+    </select>
+
+    <select id="countDatasource" resultType="int">
+        SELECT count(*)
+        FROM datasource
+        <include refid="findWhere"/>
+    </select>
+
+    <select id="headDatasource" resultType="com.yhdx.baseservice.shards.domain.dto.DatasourceHeadDTO">
+        SELECT
+            datasource_id AS datasourceId,
+            `type`,
+            `name`,
+            remark
+        FROM datasource
+        <include refid="findWhere"/>
+    </select>
+
+</mapper>
+

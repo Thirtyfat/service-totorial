@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yhdx.baseframework.tool.dao.api.UserLogDao">
+
+    <resultMap id="UserLogResultMap" type="com.mglj.totorial.framework.tool.audit.domain.UserLog">
+        <result property="id" column="id"/>
+        <result property="applicationId" column="application_id"/>
+        <result property="operationHashCode" column="operation_hash_code"/>
+        <result property="operationOffset" column="operation_offset"/>
+        <result property="bizId" column="biz_id"/>
+        <result property="bizCode" column="biz_code"/>
+        <result property="description" column="description"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="organizationId" column="organization_id"/>
+        <result property="organizationName" column="organization_name"/>
+        <result property="operationTime" column="operation_time"/>
+        <result property="cost" column="cost"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="columns">
+		id,
+		application_id,
+		operation_hash_code,
+		operation_offset,
+		biz_id,
+		biz_code,
+		description,
+		user_id,
+		user_name,
+		organization_id,
+		organization_name,
+		operation_time,
+		cost,
+		create_time
+	</sql>
+
+    <insert id="saveAllUserLog">
+        INSERT INTO user_log (
+        id ,
+        application_id ,
+        operation_hash_code ,
+        operation_offset ,
+        biz_id ,
+        biz_code ,
+        description ,
+        user_id ,
+        user_name ,
+        organization_id ,
+        organization_name ,
+        operation_time ,
+        cost ,
+        create_time
+        ) VALUES
+        <foreach collection="collection" item="item" open="(" close=")" separator="),(">
+            #{item.id} ,
+            #{item.applicationId} ,
+            #{item.operationHashCode} ,
+            #{item.operationOffset} ,
+            #{item.bizId} ,
+            #{item.bizCode} ,
+            #{item.description} ,
+            #{item.userId} ,
+            #{item.userName} ,
+            #{item.organizationId} ,
+            #{item.organizationName} ,
+            #{item.operationTime} ,
+            #{item.cost} ,
+            NOW()
+        </foreach>
+    </insert>
+
+    <sql id="findWhere">
+        <where>
+            <if test="applicationId !=null">
+                AND application_id = #{applicationId}
+            </if>
+            <if test="bizId !=null">
+                AND biz_id = #{bizId}
+            </if>
+            <if test="bizCode !=null and bizCode != ''">
+                AND biz_code = #{bizCode}
+            </if>
+            <if test="userId !=null">
+                AND user_id = #{userId}
+            </if>
+            <if test="userName !=null and userName != ''">
+                AND user_name = #{userName}
+            </if>
+            <if test="organizationName !=null and organizationName !=''">
+                AND organization_name = #{organizationName}
+            </if>
+            <if test="operationTimeStart !=null">
+                AND operation_time >= #{operationTimeStart}
+            </if>
+            <if test="operationTimeEnd !=null">
+                AND operation_time &lt;= #{operationTimeEnd}
+            </if>
+        </where>
+    </sql>
+
+    <select id="listUserLog" resultMap="UserLogResultMap">
+        SELECT
+        <include refid="columns"/>
+        FROM `user_log`
+        INNER JOIN (
+        SELECT id
+        FROM `user_log`
+        <include refid="findWhere"/>
+        ORDER BY id DESC
+        LIMIT #{offset}, #{rows}
+        ) AS t
+        USING(id)
+    </select>
+
+    <select id="countUserLog" resultType="int">
+        SELECT count(*)
+        FROM user_log
+        <include refid="findWhere"/>
+    </select>
+
+</mapper>
+
